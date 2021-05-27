@@ -1,0 +1,23 @@
+1. In some places your code violated the PEP8 rules. Please, consider using some code formatter (except black). Even
+pylint do the trick.
+2. The public method should be placed on top of the class definition. The privates method goes after.
+3. You should consider moving a huge part of code from ConfigLoader class directly into Config class, or even squash these
+two classes into one. The ConfigLoader is mainly responsible for the creation of Config object, including attribute or
+source data. A properly designed Config class should be able to handle its creation process by itself, according to the SRP
+rule.
+4. We can easily use a Strategy Pattern (https://refactoring.guru/design-patterns/strategy) within the Config class.
+ The Config object can act differently with a different type of environments, so that pattern is the best way to keep our code simple. Example:
+
+ Class Config:
+     loader_strategy = {
+         "local": local_loader,
+         "prod": aws_loader
+     }
+     def __init__(env_type):
+         self._config = self.loader_strategy.get(env_type)()
+
+5. I have few remarks about testing:
+    - We should keep our test cases within test class - that's allowed us to save a lot of lines, mostly thanks to
+      setUp methods and initial data for all test cases within.
+    - One test case - one assertion.
+    - Test data should be kept in a separate file.
